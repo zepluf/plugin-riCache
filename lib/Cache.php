@@ -19,6 +19,10 @@ class Cache {
 	    $this->status = Plugin::get('riPlugin.Settings')->get('riCache.status');
 	}
 	
+	public function getPath(){
+	   return $this->path; 
+	}
+	
 	public function write($name, $cache_folder, $content, $use_subfolder = false){
 		
 		if(!$this->status) return false;
