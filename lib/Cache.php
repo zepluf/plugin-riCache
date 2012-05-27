@@ -14,8 +14,8 @@ use plugins\riPlugin\Plugin;
 class Cache {
 	protected $cache, $path, $status, $blocks = array();
 
-	public function __construct(){
-	    $this->path = DIR_FS_CATALOG . Plugin::get('riPlugin.Settings')->get('riCache.path');
+	public function __construct($path = null){
+	    $this->path = empty($path) ? DIR_FS_CATALOG . Plugin::get('riPlugin.Settings')->get('riCache.path') : $path;
 	    $this->status = Plugin::get('riPlugin.Settings')->get('riCache.status');
 	}
 	
@@ -34,7 +34,7 @@ class Cache {
 		$cache_file = "$cache_folder/$name";
 		
 		$written = 0;
-	    if ($fp = @fopen($cache_file, 'xb')) {
+	    if ($fp = @fopen($cache_file, 'wb')) {
 
 	        // lock file for writing
 			if (flock($fp, LOCK_EX)) {
