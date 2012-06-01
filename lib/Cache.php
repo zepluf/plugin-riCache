@@ -67,10 +67,14 @@ class Cache {
 		return $read ? $read : false;
 	}
 	
-	public function remove($dir, $DeleteMe = false){
-	    $counter = 0;
-	    Plugin::get('riUtility.File')->sureRemoveDir($this->path . $dir, $DeleteMe, $counter);
-	    return $counter;
+	public function remove($name = '', $cache_folder, $DeleteMe = false){
+	    if(empty($name)){
+    	    $counter = 0;
+    	    Plugin::get('riUtility.File')->sureRemoveDir($this->path . $cache_folder, $DeleteMe, $counter);
+    	    return $counter;
+	    }
+	    else 
+	        return @unlink($this->path . $cache_folder . $name);
 	}
 	
 	public function startBlock($id, $change_on_page = false, $depend_on = "", $post_safe = true){
