@@ -14,18 +14,21 @@ use plugins\riPlugin\Plugin;
 class Cache {
 	protected $cache, $path, $status, $blocks = array();
 
-	public function __construct($path = null){
-	    $this->path = empty($path) ? DIR_FS_CATALOG . Plugin::get('riPlugin.Settings')->get('riCache.path') : $path;
-	    $this->status = Plugin::get('riPlugin.Settings')->get('riCache.status');
+	public function __construct(){	    
+	    $this->status = Plugin::get('settings')->get('riCache.status');
 	}
 	
 	public function getPath(){
 	   return $this->path; 
 	}
 	
-	public function write($name, $cache_folder, $content, $use_subfolder = false){
+	public function write($file, $content, $use_subfolder = false){
 		
 		if(!$this->status) return false;
+		
+		$cache_folder = dirname($file);
+		
+		$name = basename($file);
 		
 		$this->cache[$cache_folder][$name] = $content;
 			
@@ -51,9 +54,13 @@ class Cache {
 		return $written !== false && $written > 0 ? $cache_file : false;
 	}
 
-	public function read($name, $cache_folder ='', $use_subfolder = false){
+	public function read($file, $use_subfolder = false){
 		
 		if(!$this->status) return false;
+		
+		$cache_folder = dirname($file);
+		
+		$name = basename($file);
 		
 		if(isset($this->cache[$cache_folder][$name]))
 			return $this->cache[$cache_folder][$name];
@@ -70,11 +77,11 @@ class Cache {
 	public function remove($name = '', $cache_folder, $DeleteMe = false){
 	    if(empty($name)){
     	    $counter = 0;
-    	    Plugin::get('riUtility.File')->sureRemoveDir($this->path . $cache_folder, $DeleteMe, $counter);
+    	    Plugin::get('riUtility.File')->sureRemoveDir($cache_folder, $DeleteMe, $counter);
     	    return $counter;
 	    }
 	    else 
-	        return @unlink($this->path . $cache_folder . $name);
+	        return @unlink($cache_folder . $name);
 	}
 	
 	public function startBlock($id, $change_on_page = false, $depend_on = "", $post_safe = true){
@@ -85,7 +92,7 @@ class Cache {
 		
 		$id = md5($id.$depend_on);
 		
-		if(($content = $this->read($id, 'content')) !== false){
+		if(($content = $this->read(Plugin::get('settings')->get('riCache.cache_path') . $id, 'content')) !== false){
 			echo $content;
 			return true;
 		}
@@ -103,8 +110,8 @@ class Cache {
 		global $current_page_base;
 		
 		$id = md5($current_page_base.getenv('REQUEST_URI').$depend_on);
-		
-		if(($content = $this->read($id, 'content')) !== false){
+
+		if(($content = $this->read(Plugin::get('settings')->get('riCache.cache_path') . $id)) !== false){
 			echo $content;
 			return true;
 		}
@@ -121,18 +128,19 @@ class Cache {
 			
 		$id = array_pop($this->blocks); 
 		$content = ob_get_clean();        
-        $this->write($id, 'content', $content);
+        $this->write(Plugin::get('settings')->get('riCache.cache_path') . $id, $content);
         
         echo $content;
 	}
 	
-	public function exists($name, $cache_folder = '', $use_subfolder = false){
-		$cache_folder = $this->calculatePath($cache_folder, $use_subfolder);
+	public function exists($file, $use_subfolder = false){
+        $name = basename($file);
+		$cache_folder = $this->calculatePath(dirname($file), $use_subfolder);
 		return file_exists("$cache_folder/$name") ? "$cache_folder/$name" : false;
 	}					
 	
 	private function calculatePath($cache_folder, $use_subfolder){
-	    $cache_folder = $this->path."$cache_folder/";
+	    $cache_folder = "$cache_folder/";
 		if($use_subfolder){
 			$path = substr($name , 0, 4);
 			$cache_folder .= chunk_split($path, 1, '/');

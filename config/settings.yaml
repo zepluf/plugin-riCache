@@ -1,2 +1,2 @@
-path: cache/
+cache_path: <?php echo DIR_FS_SQL_CACHE?>blocks/
 status: true
