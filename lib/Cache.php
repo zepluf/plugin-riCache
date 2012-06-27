@@ -26,13 +26,13 @@ class Cache {
 		
 		if(!$this->status) return false;
 		
-		$cache_folder = dirname($file);
+		$cache_folder = Plugin::get('settings')->get('riCache.cache_path') . dirname($file);
 		
 		$name = basename($file);
 		
 		$this->cache[$cache_folder][$name] = $content;
 			
-		$cache_folder = $this->calculatePath($cache_folder, $use_subfolder);
+		$cache_folder = $this->calculatePath($name, $cache_folder, $use_subfolder);
 		
 		$cache_file = "$cache_folder/$name";
 		
@@ -58,14 +58,14 @@ class Cache {
 		
 		if(!$this->status) return false;
 		
-		$cache_folder = dirname($file);
+		$cache_folder = Plugin::get('settings')->get('riCache.cache_path') . dirname($file);
 		
 		$name = basename($file);
 		
 		if(isset($this->cache[$cache_folder][$name]))
 			return $this->cache[$cache_folder][$name];
 			
-		$cache_folder = $this->calculatePath($cache_folder, $use_subfolder);
+		$cache_folder = $this->calculatePath($name, $cache_folder, $use_subfolder);
 		
 		$cache_file = "$cache_folder/$name";
 			
@@ -135,11 +135,11 @@ class Cache {
 	
 	public function exists($file, $use_subfolder = false){
         $name = basename($file);
-		$cache_folder = $this->calculatePath(dirname($file), $use_subfolder);
+		$cache_folder = $this->calculatePath($name, dirname($file), $use_subfolder);
 		return file_exists("$cache_folder/$name") ? "$cache_folder/$name" : false;
 	}					
 	
-	private function calculatePath($cache_folder, $use_subfolder){
+	private function calculatePath($name, $cache_folder, $use_subfolder){
 	    $cache_folder = "$cache_folder/";
 		if($use_subfolder){
 			$path = substr($name , 0, 4);
