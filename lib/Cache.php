@@ -26,9 +26,13 @@ class Cache {
 		
 		if(!$this->status) return false;
 		
-		$cache_folder = Plugin::get('settings')->get('riCache.cache_path') . dirname($file);
-		
-		$name = basename($file);
+		$cache_folder = dirname($file);
+
+        // if this dir does not exist, assuming we need to append absolute cache path
+        if(!is_dir($cache_folder))
+            $cache_folder = Plugin::get('settings')->get('riCache.cache_path') . $cache_folder;
+
+        $name = basename($file);
 		
 		$this->cache[$cache_folder][$name] = $content;
 			
@@ -57,10 +61,14 @@ class Cache {
 	public function read($file, $use_subfolder = false){
 		
 		if(!$this->status) return false;
-		
-		$cache_folder = Plugin::get('settings')->get('riCache.cache_path') . dirname($file);
-		
-		$name = basename($file);
+
+        $cache_folder = dirname($file);
+
+        // if this dir does not exist, assuming we need to append absolute cache path
+        if(!is_dir($cache_folder))
+            $cache_folder = Plugin::get('settings')->get('riCache.cache_path') . $cache_folder;
+
+        $name = basename($file);
 		
 		if(isset($this->cache[$cache_folder][$name]))
 			return $this->cache[$cache_folder][$name];
