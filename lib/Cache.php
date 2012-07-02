@@ -85,6 +85,8 @@ class Cache {
 	public function remove($name = '', $cache_folder, $DeleteMe = false){
 	    if(empty($name)){
     	    $counter = 0;
+            if(!is_dir($cache_folder))
+                $cache_folder = Plugin::get('settings')->get('riCache.cache_path') . $cache_folder;
     	    Plugin::get('riUtility.File')->sureRemoveDir($cache_folder, $DeleteMe, $counter);
     	    return $counter;
 	    }
