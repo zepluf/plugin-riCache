@@ -157,12 +157,9 @@ class Cache {
 		}
 			
 		$cache_folder = rtrim($cache_folder, '/');
-		
-		if(!is_dir($cache_folder)){
-			$old_umask = umask(0);
-			@mkdir($cache_folder, 0777, true);
-			umask($old_umask);
-		}
+
+        riMkDir($cache_folder);
+
 		return $cache_folder;
 	}
 }
