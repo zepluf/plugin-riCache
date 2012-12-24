@@ -1,0 +1,4 @@
+services:
+  ricache.cache:
+    class:        plugins\riCache\Cache
+    arguments:    [@settings, @utility.file]

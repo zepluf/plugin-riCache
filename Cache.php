@@ -2,8 +2,6 @@
 
 namespace plugins\riCache;
 
-use plugins\riPlugin\Plugin;
-
 /**
  * @package Pages
  * @copyright Copyright 2003-2006 Zen Cart Development Team
@@ -12,10 +10,45 @@ use plugins\riPlugin\Plugin;
  * @version $Id: cache.php 274 2009-11-20 17:13:45Z yellow1912 $
  */
 class Cache {
-	protected $cache, $path, $status, $blocks = array();
 
-	public function __construct(){	    
-	    $this->status = Plugin::get('settings')->get('riCache.status');
+    /**
+     * @var
+     */
+	protected $cache;
+
+    /**
+     * @var
+     */
+    protected $path;
+
+    /**
+     * @var
+     */
+    protected $status;
+
+    /**
+     * @var array
+     */
+    protected $blocks = array();
+
+    /**
+     * @var
+     */
+    protected $settings;
+
+    /**
+     * @param $settings
+     */
+
+    /**
+     * @var
+     */
+    protected $utilityFile;
+
+	public function __construct($settings, $utilityFile){
+        $this->settings = $settings;
+        $this->utilityFile = $utilityFile;
+	    $this->status = $settings->get('ricache.status');
 	}
 	
 	public function getPath(){
@@ -29,8 +62,9 @@ class Cache {
 		$cache_folder = dirname($file);
 
         // if this dir does not exist, assuming we need to append absolute cache path
-        if(!is_dir($cache_folder))
-            $cache_folder = Plugin::get('settings')->get('riCache.cache_path') . $cache_folder;
+        if(!is_dir($cache_folder)) {
+            $cache_folder = $this->settings->get('ricache.cache_path') . $cache_folder;
+        }
 
         $name = basename($file);
 		
@@ -66,7 +100,7 @@ class Cache {
 
         // if this dir does not exist, assuming we need to append absolute cache path
         if(!is_dir($cache_folder))
-            $cache_folder = Plugin::get('settings')->get('riCache.cache_path') . $cache_folder;
+            $cache_folder = $this->settings->get('ricache.cache_path') . $cache_folder;
 
         $name = basename($file);
 		
@@ -84,14 +118,16 @@ class Cache {
 	
 	public function remove($name = '', $cache_folder, $DeleteMe = false){
 	    if(empty($name)){
-    	    $counter = 0;
-            if(!is_dir($cache_folder))
-                $cache_folder = Plugin::get('settings')->get('riCache.cache_path') . $cache_folder;
-    	    Plugin::get('riUtility.File')->sureRemoveDir($cache_folder, $DeleteMe, $counter);
-    	    return $counter;
+
+            if(!is_dir($cache_folder)) {
+                $cache_folder = $this->settings->get('ricache.cache_path') . $cache_folder;
+            }
+
+            return $this->utilityFile->sureRemoveDir($cache_folder, $DeleteMe);
 	    }
-	    else 
+	    else {
 	        return @unlink($cache_folder . $name);
+        }
 	}
 	
 	public function startBlock($id, $change_on_page = false, $depend_on = "", $post_safe = true){
@@ -102,7 +138,7 @@ class Cache {
 		
 		$id = md5($id.$depend_on);
 		
-		if(($content = $this->read(Plugin::get('settings')->get('riCache.cache_path') . $id, 'content')) !== false){
+		if(($content = $this->read($this->settings->get('ricache.cache_path') . $id, 'content')) !== false){
 			echo $content;
 			return true;
 		}
@@ -121,7 +157,7 @@ class Cache {
 		
 		$id = md5($current_page_base.getenv('REQUEST_URI').$depend_on);
 
-		if(($content = $this->read(Plugin::get('settings')->get('riCache.cache_path') . $id)) !== false){
+		if(($content = $this->read($this->settings->get('ricache.cache_path') . $id)) !== false){
 			echo $content;
 			return true;
 		}
@@ -138,7 +174,7 @@ class Cache {
 			
 		$id = array_pop($this->blocks); 
 		$content = ob_get_clean();        
-        $this->write(Plugin::get('settings')->get('riCache.cache_path') . $id, $content);
+        $this->write($this->settings->get('ricache.cache_path') . $id, $content);
         
         echo $content;
 	}
