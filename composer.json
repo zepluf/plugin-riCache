@@ -1,0 +1,12 @@
+{
+    "name": "zepluf/plugin-ricache",
+    "description": "The \"Cache\" plugin",
+    "type": "zepluf-plugin",
+    "license": "custom",
+    "version": "1.1.0",
+    "require": {
+        "php": ">=5.3.3",
+        "zepluf/installer": "*"
+    },
+    "target-dir": "riCache"
+}
