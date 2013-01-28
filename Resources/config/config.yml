@@ -1,3 +1,2 @@
 settings:
-  cache_path: <?php echo DIR_FS_SQL_CACHE?>/
   status: true

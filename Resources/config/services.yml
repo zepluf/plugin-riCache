@@ -1,4 +1,4 @@
 services:
   ricache.cache:
     class:        plugins\riCache\Cache
-    arguments:    [@settings, @utility.file]
+    arguments:    [@settings, @utility.file, %kernel.cache_dir%]
